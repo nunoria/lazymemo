@@ -9,6 +9,9 @@ module.exports = {
       'xl': '1180px',
       '2xl': '1400px',
     },
+    fontFamily: {
+      'pretandard' : ['Pretendard'],
+    },
     extend: {},
   },
   plugins: [],
