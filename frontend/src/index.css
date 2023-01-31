@@ -15,3 +15,18 @@ code {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .bg-top {
+    background-color:#F9B900;
+  }
+  .bg-carousel {
+    background-color:#E2E2E2;
+  }
+  .bg-contents {
+    background-color:#EBEBEB;
+  }
+  .bg-footer {
+    background-color:#40403F;
+  }
+}

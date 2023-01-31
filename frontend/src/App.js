@@ -1,9 +1,13 @@
 import './App.css';
+import {Top, Main, Footer} from "./components/Layout"
 
 function App() {
     return (
         <div className="App">
-            <h1>hello world</h1>
+            {/* Layout */}
+            <Top></Top>
+            <Main></Main>
+            <Footer></Footer>
         </div>
     );
 }
