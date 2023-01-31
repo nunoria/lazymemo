@@ -2,3 +2,9 @@
   text-align: center;
 }
 
+/* 최상위 container */
+.pbox {
+  width: 1400px;
+  /* margin: auto 0; */
+  height: 100%;
+}
