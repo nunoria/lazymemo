@@ -2,9 +2,10 @@
   text-align: center;
 }
 
-/* 최상위 container */
+/* 컴포넌트의 상위 container */
 .pbox {
   width: 1400px;
+  min-width: 344px;
   height: 100%;
   padding: 0 20px;
 }
