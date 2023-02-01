@@ -29,6 +29,12 @@ code {
   .bg-footer {
     background-color:#40403F;
   }
+  .bg-theme-gray {
+    background-color:#40403F;
+  }
+  .text-theme-gray {
+    color:#40403F;
+  }
 
 }
 
