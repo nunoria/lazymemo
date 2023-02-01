@@ -1,6 +1,6 @@
 
-import Navi from "./Navi";
 import { Routes, Route, Navigate } from 'react-router-dom';
+import Navi from "./Navi";
 import Dashboard from "./main/Dashboard";
 import TagList from "./main/TagList";
 import CardList from "./main/CardList";
@@ -12,9 +12,9 @@ const FOOTER_HEIGHT = "200px";
 export const Top = () => {
 
     return (
-        <div className="flex justify-center bg-top h-[87px]">
+        <nav>
             <Navi />
-        </div>
+        </nav>
     )
 }
 
@@ -46,6 +46,8 @@ export const Main = () => {
 export const Footer = () => {
 
     return (
-        <div className=" bg-footer h-[200px]"></div>
+        <footer>
+            <div className=" bg-footer h-[200px]"></div>
+        </footer>
     )
 }
