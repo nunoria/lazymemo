@@ -51,3 +51,12 @@ export const Footer = () => {
         </footer>
     )
 }
+
+export const TagButton = ({name, onClickEvent}) => {
+    return (
+        <button onClick={onClickEvent}>
+            <span>{name}</span>
+        </button>
+    )
+}
+
