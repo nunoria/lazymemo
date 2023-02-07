@@ -26,7 +26,7 @@ export default function Navi() {
                     <Link to={NAVI_BTN_MYURL.url}><Button name={NAVI_BTN_MYURL.name}  isActive={location.pathname==NAVI_BTN_MYURL.url?true:false}/></Link>
                     <Link to={NAVI_BTN_ALLURL.url}><Button name={NAVI_BTN_ALLURL.name} isActive={location.pathname==NAVI_BTN_ALLURL.url?true:false}/></Link>
                 </div>
-                <div className=" basis-1/3">
+                <div className=" basis-1/3 text-center">
                     <Link to="/">
                         <span>Home</span>
                     </Link>

@@ -22,7 +22,7 @@ export default function CardList() {
 
 const Card = ({ value }) => {
     return (
-        <div className=" bg-red-300 rounded-2xl aspect-square">
+        <div className=" bg-red-300 rounded-2xl aspect-square text-center">
             <span>{value}</span>
         </div>
     )

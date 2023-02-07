@@ -1,8 +1,9 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont,'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  color: rgba(0,0,0,.87);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -28,6 +29,9 @@ code {
   }
   .bg-footer {
     background-color:#40403F;
+  }
+  .bg-theme-yellow {
+    background-color:#F9B900;
   }
   .bg-theme-gray {
     background-color:#40403F;
