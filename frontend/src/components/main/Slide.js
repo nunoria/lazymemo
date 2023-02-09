@@ -1,5 +1,6 @@
 import Modal from "../Modal"
 import { useState } from 'react';
+import GetURLInfo from "../GetData";
 
 
 export default function Slide() {
@@ -18,6 +19,7 @@ export default function Slide() {
             {
                 modalState && <Modal modalCtl={modalCtl} />
             }
+            <GetURLInfo />
         </div>
     )
 }

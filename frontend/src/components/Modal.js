@@ -1,10 +1,45 @@
 import React, { useState, useEffect } from 'react';
+import { getKeyword } from './GetData';
+import { Button, TagButton } from './Buttons';
+
+const INPUT_TIMEOUT = 2000;
 
 const Modal = ({ modalCtl }) => {
     const [count, setCount] = useState(1);
+    const [timer, setTimer] = useState(null);
+    const [urlText, setUrlText] = useState('');
+    const [proposalTag, setProposalTag] = useState(null);
 
     console.log(`count = ${count}`);
 
+    const onChangeUrl = (e) =>{
+
+        setUrlText(e.target.value);
+
+        // url 인풋박스에 마지막 키보드 입력후 일정시간 이후에 url 값을 읽어 오도록 함
+        timer!=null && clearTimeout(timer)
+        setProposalTag(null);
+
+
+        // input 값이 URL 형식인지 확인할까 했는데, 최소 숫자만 확인 ex) a.com 이 가장 짧은 URL이므로
+        // length 가 5 이하인지만 확인
+        if(e.target.value.length<5)return;
+
+        setTimer(setTimeout(()=>{
+            getKeyword(e.target.value)
+            .then((response)=>{
+                // 헤더 값을 읽어 왔음
+                if(response.tag){
+                    console.log(response.tag)
+                    setProposalTag(response.tag);
+                }
+            
+            })
+            .catch((error)=>console.log(error));
+
+        },INPUT_TIMEOUT));
+    }
+    
     useEffect(() => {
         console.log("scroll hidden");
         document.body.style.overflow = 'hidden';
@@ -30,12 +65,19 @@ const Modal = ({ modalCtl }) => {
                 <div name="ModalBody" className='my-5'>
                     <div>
                         <div className=' text-md font-semibold .text-theme-gray mb-3'>URL 정보를 입력해주세요</div>
-                        <input type="text" name="url" id="url" placeholder="URL 주소를 입력해주세요."
+                        <input type="text" name="url" id="url" placeholder="URL 주소를 입력해주세요." onChange={onChangeUrl} value={urlText}
                             className='w-full h-[38px] px-4 rounded-xl border-[1px] border-gray-300 outline-none' />
                     </div>
                     <div className='border-b-[1px] border-gray-300'>
                         <div className=' text-md font-semibold .text-theme-gray my-3'>해시태그를 선택해주세요.</div>
-                        <div className=" h-[60px] w-full py-3">{/* 추천해시태그 블럭 */}</div>
+                        <div className=" min-h-[70px] w-full py-3 flex gap-2">
+                            {/* 추천해시태그 블럭 */
+                                proposalTag && proposalTag.map((v,i)=>{
+                                    return <TagButton name={v} key={i}/>
+
+                                })
+                            }
+                        </div>
                     </div>
                     <div>
                         <div className=" h-[60px] w-full py-3">{/* 나의해시태그 블럭 */}</div>
