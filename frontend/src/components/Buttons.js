@@ -14,17 +14,14 @@ export const Button = ({ name, isActive, onClickEvent }) => {
     )
 }
 
-export const TagButton = ({ name, onClickEvent }) => {
-    const [clicked, setClicked] = useState(false);
+export const TagButton = ({ name, isActive, onClickEvent }) => {
 
     const activeClass = "bg-theme-yellow text-white border-yellow-400";
     const inActiveClass = "text-gray-400 border-gray-400";
 
     return (
-        <button onClick={()=>{
-            clicked? setClicked(false):setClicked(true)
-        }}
-            className={"px-6 py-1 font-pretandard font-bold text-sm rounded-2xl border-[1px] h-fit " + (clicked ? activeClass : inActiveClass)}>
+        <button onClick={onClickEvent}
+            className={"px-6 py-1 font-pretandard font-bold text-sm rounded-2xl border-[1px] h-fit " + (isActive ? activeClass : inActiveClass)}>
             <span>{name}</span>
         </button>
     )

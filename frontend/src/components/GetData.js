@@ -3,7 +3,7 @@ import axios from "axios";
 import * as cheerio from 'cheerio';
 const url = "https://yozm.wishket.com/magazine/detail/1851/";
 
-async function getHeader (url) {
+async function getHeader(url) {
 
     let start = Date.now();
 
@@ -24,7 +24,7 @@ async function getHeader (url) {
         console.log(`경과시간: ${end - start}ms`);
 
         return header;
-        
+
     } catch (err) {
         console.log("Error>>", err);
         return err;
@@ -32,25 +32,25 @@ async function getHeader (url) {
 
 }
 
-async function getKeyword (url) {
+async function getKeyword(url) {
 
     let start = Date.now();
-    const keyword_count = 3;
+    const keyword_count = 3;  // 최대 키워드 숫자
 
     try {
         const response = await axios.get(url);
         const $ = cheerio.load(response.data);
 
         let header = {};
-        header.keyword = $('meta[property="og:keyword"]').attr('content');
+        header.keywordString = $('meta[property="og:keyword"]').attr('content');
         header.description = $('meta[property="og:description"]').attr('content');
 
         // open AI 에 description  주고, 키워드 받기를 구현 합시다
-        if(header.keyword !=null) {
-            header.tag=header.keyword.split(',');
+        if (header.keywordString != null) {
+            header.keywords = header.keywordString.split(',');
 
-            while(header.tag.length>keyword_count){
-                header.tag.pop()
+            while (header.keywords.length > keyword_count) {
+                header.keywords.pop()
             }
         }
 
@@ -60,7 +60,7 @@ async function getKeyword (url) {
         console.log(`경과시간: ${end - start}ms`);
 
         return header;
-        
+
     } catch (err) {
         console.log("Error>>", err);
         return err;
@@ -85,9 +85,9 @@ export default function GetURLInfo() {
 
     return (
         <div>
-            <button className=" bg-green-400 p-2 rounded-lg" onClick={()=>{
+            <button className=" bg-green-400 p-2 rounded-lg" onClick={() => {
                 console.log("데이터 클릭");
-                getHeader(url).then((res)=>console.log(res));
+                getHeader(url).then((res) => console.log(res));
             }}>데이터 가져오기</button>
         </div>
     )
@@ -95,4 +95,4 @@ export default function GetURLInfo() {
 
 }
 
-export {getHeader, getKeyword}
+export { getHeader, getKeyword }
