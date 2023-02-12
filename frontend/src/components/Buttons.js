@@ -8,7 +8,7 @@ export const Button = ({ name, isActive, onClickEvent }) => {
 
     return (
         <button onClick={onClickEvent}
-            className={"px-5 py-3 font-pretandard font-bold text-sm rounded-3xl " + (isActive ? activeClass : inActiveClass)} >
+            className={"px-4 py-3 font-pretandard font-bold text-sm rounded-3xl " + (isActive ? activeClass : inActiveClass)} >
             <span>{name}</span>
         </button>
     )
