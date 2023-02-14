@@ -16,7 +16,7 @@ const NAVI_BTN_ALLURL = {
 
 export default function Navi() {
 
-    const { user, isLogin } = useUserStore();
+    const { user, isLogin, logUserInfo } = useUserStore();
     const [popupOn, setPopupOn] = useState(false);
     let location = useLocation();
     // console.log(location.pathname);
@@ -36,15 +36,14 @@ export default function Navi() {
                 </div>
                 <div className=" basis-1/3 flex justify-end gap-1">
                     <button onClick={() => {
-                        console.log(user);
-                        console.log('isLogin:', isLogin)
+                        logUserInfo();
                     }}><img className="w-[28px] h-[28px]" src={require('resource/info.svg').default} alt="info" /></button>
 
-                    <div className=' relative' onMouseOver={() => {if(isLogin)setPopupOn(true)}} onMouseOut={() => setPopupOn(false)}>
+                    <div className=' relative' onMouseOver={() => { if (isLogin) setPopupOn(true) }} onMouseOut={() => setPopupOn(false)}>
                         {
-                            user 
-                            ? <img className="w-[40px] h-[40px]" src={require('resource/profile.svg').default} alt="info" />
-                            : <img className="w-[28px] h-[28px] ml-2" src={require('resource/guest.svg').default} alt="info" />
+                            user
+                                ? <img className="w-[40px] h-[40px]" src={require('resource/profile.svg').default} alt="info" />
+                                : <img className="w-[28px] h-[28px] ml-2" src={require('resource/guest.svg').default} alt="info" />
                         }
                         <div className={"absolute top-10 left-1/2 -translate-x-1/2 " + (popupOn ? "" : "hidden")}>
                             <div className=' flex flex-col items-center gap-2 bg-white w-[120px] rounded-md text-gray-400 py-2 font-bold '>

@@ -71,7 +71,6 @@ async function getKeyword(url) {
 
 export default function GetURLInfo() {
 
-    console.log("GetURLInfo");
 
     // let post_data = {
     //     url : url,
@@ -86,7 +85,7 @@ export default function GetURLInfo() {
     return (
         <div>
             <button className=" bg-green-400 p-2 rounded-lg" onClick={() => {
-                console.log("데이터 클릭");
+                console.log("GetURLInfo");
                 getHeader(url).then((res) => console.log(res));
             }}>데이터 가져오기</button>
         </div>
