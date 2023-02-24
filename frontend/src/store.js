@@ -22,9 +22,9 @@ const initUserStore = {
 }
 
 export class Url {
-    constructor({ url, site, description, title, image, created, isShare, readDone, tags }) {
+    constructor({ url, siteName, description, title, image, created, isShare, readDone, tags }) {
         this._url = url;
-        this.site = site;
+        this.siteName = siteName;
         this.description = description;
         this.title = title;
         this.image = image;
@@ -34,13 +34,19 @@ export class Url {
         this.tags = tags;
     }
 
+    static createNew (item) {
+        return new Url({...item, created: new Date()})
+    }
+
     get url() {
         return this._url;
     }
 
+    // DB에 저장하기 위한 data 는 1level 객체형태여야함. Url class 인스턴스에서 필요한 요소만 뽑아서
+    // 1 level 객체로 만듬.
     convertToDbUrlData() {
         let { url,
-            site,
+            siteName,
             description,
             title,
             image,
@@ -52,7 +58,7 @@ export class Url {
 
         let tmpUrl = {
             url,
-            site,
+            siteName,
             description,
             title,
             image,
@@ -168,18 +174,20 @@ export const useUserStore = create((set, get) => ({
             //         urlInfo[key] = "";
             // }
 
-            urlInfo.urlDbRef = await addMyUrlsDoc(get().userDbRef, urlInfo.convertToDbUrlData());
+            let newUrl = Url.createNew(urlInfo)
 
-            if (urlInfo.urlDbRef == null) {
+            newUrl.urlDbRef = await addMyUrlsDoc(get().userDbRef, newUrl.convertToDbUrlData());
+
+            if (newUrl.urlDbRef == null) {
                 throw new Error("add to DB is failed.")
             }
 
-            console.log('addMyUrl: success!', urlInfo);
+            console.log('addMyUrl: success!', newUrl);
 
             set((state) => ({
                 myUrls: [
                     ...state.myUrls,
-                    urlInfo
+                    newUrl
                 ]
             }))
 

@@ -1,6 +1,6 @@
 import Modal from "../Modal"
 import { useState } from 'react';
-import GetURLInfo from "../GetData";
+import { getUrlMetaToLog } from "../GetData";
 import { useUserStore, Url } from "store"
 
 import { getUserDocById } from "components/db/Contorl";
@@ -42,7 +42,6 @@ export default function Slide() {
             {
                 modalState && <Modal modalCtl={modalCtl} />
             }
-            <GetURLInfo />
             <br />
             <input className=" mx-2 p-1 rounded-md border-[1px] border-gray-500 outline-none" type="text" name="email" value={email} onChange={onChange} placeholder="input email" />
             <button onClick={() => {
@@ -68,17 +67,15 @@ export default function Slide() {
 
             <br />
             <input className=" mx-2 p-1 rounded-md border-[1px] border-gray-500 outline-none" type="text" name="url" value={url} onChange={onChange} placeholder="input URL" />
-            <button onClick={() => {
-
-
-            }}
+            <button onClick={() => { getUrlMetaToLog(url) }}
                 className=" bg-pink-400 rounded-md p-1"> 사이트 정보가져오기</button>
 
             <br />
-            <button onClick={()=>{ getMyUrls()
+            <button onClick={() => {
+                getMyUrls()
 
             }}
-            className=" bg-blue-300 p-1 rounded-md">get MyUrls </button>
+                className=" bg-blue-300 p-1 rounded-md">get MyUrls </button>
 
         </div>
     )

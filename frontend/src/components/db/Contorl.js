@@ -52,6 +52,7 @@ const getMyUrlsDocs = async (userDbRef) => {
         let res = [];
         querySnapshot.forEach((docSnap) => {
             let docData = docSnap.data();
+            docData.created = docData.created?.toDate();
             let docRef = doc(userDbRef, MYURLS_COLLECTION_NAME, docSnap.id);
             res.push({ docRef: docRef, docData: docData });
         })

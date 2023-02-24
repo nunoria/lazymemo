@@ -146,9 +146,9 @@ const Modal = ({ modalCtl }) => {
                 </div>
                 <div name="ModalSave" className='my-3'>
                     <button onClick={() => {
-                        addMyUrl(makeSendData([...proposalTag, ...myTag], urlInfo))
-                        .then(modalCtl(false))
-                        .catch(console.log("저장실패"));
+                        addMyUrl({ ...urlInfo, tags: makeTagsArray([...proposalTag, ...myTag]) })
+                            .then(modalCtl(false))
+                            .catch(console.log("저장실패"));
                     }}
                         className=' bg-theme-gray rounded-xl h-[48px] w-full text-center text-white font-semibold'>
                         <span>저장하기</span>
@@ -166,6 +166,19 @@ const Modal = ({ modalCtl }) => {
 // 수정하기 버늩
 // 있는 url Class 인스턴스 사용
 
+const makeTagsArray = (tagList) => {
+    if (tagList.length == 0) {
+        console.log("makeTags(error): No Tag!!");
+    }
+
+    let tags = [];
+    tagList.forEach((v, i) => {
+        if (v.checked) tags.push(v.tagname);
+    });
+
+    return tags;
+}
+
 const makeSendData = (tagList, urlInfo) => {
 
     if (tagList.length == 0 || urlInfo == null) {
@@ -179,7 +192,6 @@ const makeSendData = (tagList, urlInfo) => {
     tagList.forEach((v, i) => {
         if (v.checked) tags.push(v.tagname);
     });
-
 
 
     let sendData = new Url({

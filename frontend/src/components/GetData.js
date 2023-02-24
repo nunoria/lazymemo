@@ -18,7 +18,7 @@ const url3 = "https://blog.wishket.com/%EB%A7%A4%EA%B1%B0%EC%A7%84-%EA%B0%99%EC%
 
 // }
 
-async function getHeader(url) {
+export async function getHeader(url) {
 
     let start = Date.now();
 
@@ -54,7 +54,7 @@ async function getHeader(url) {
 
 }
 
-async function getKeyword(url) {
+export async function getKeyword(url) {
 
     let start = Date.now();
     const keyword_count = 3;  // 최대 키워드 숫자
@@ -90,7 +90,7 @@ async function getKeyword(url) {
 
 }
 
-export const getUrlTest = async (url) => {
+export const getUrlMetaToLog = async (url) => {
     let start = Date.now();
 
     let urlInfo = {};
@@ -112,11 +112,10 @@ export const getUrlTest = async (url) => {
             }
         })
 
+        console.log("No    name    property   content")
         $('meta').each((i, el) => {
-            console.log(i, $(el).attr('property'),$(el).attr('content'))
+            console.log(i, $(el).attr('name'), $(el).attr('property'), $(el).attr('content'))
         })
-
-
 
         console.log(urlInfo);
 
@@ -127,22 +126,3 @@ export const getUrlTest = async (url) => {
         console.log(error)
     }
 }
-
-export default function GetURLInfo() {
-
-
-
-    return (
-        <div>
-            <button className=" bg-green-400 p-2 rounded-lg" onClick={() => {
-                console.log("GetURLInfo");
-                getUrlTest(url3);
-                // getHeader(url).then((res) => console.log(res));
-            }}>데이터 가져오기</button>
-        </div>
-    )
-
-
-}
-
-export { getHeader, getKeyword }
