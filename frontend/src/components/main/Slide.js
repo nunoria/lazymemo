@@ -1,7 +1,7 @@
 import Modal from "../Modal"
 import { useState } from 'react';
 import GetURLInfo from "../GetData";
-import { useUserStore } from "store"
+import { useUserStore, Url } from "store"
 
 import { getUserDocById } from "components/db/Contorl";
 
@@ -11,8 +11,9 @@ export default function Slide() {
     const [modalState, setModalState] = useState(false);
     const [email, setEmail] = useState("");
     const [tag, setTag] = useState("");
+    const [url, setUrl] = useState("");
 
-    const { setUser, addTag, clearUser } = useUserStore();
+    const { setUser, addTag, clearUser, addMyUrl, getMyUrls } = useUserStore();
 
 
     const modalCtl = (onOff) => {
@@ -23,12 +24,14 @@ export default function Slide() {
         const {
             target: {
                 name,
-                value
+                value,
+                url
             },
         } = event;
 
         if (name == "email") setEmail(value);
         if (name == "tag") setTag(value);
+        if (name == "url") setUrl(value);
     }
 
     return (
@@ -62,6 +65,20 @@ export default function Slide() {
                 clearUser();
             }}
                 className=" bg-pink-400 rounded-md p-1"> 로그아웃</button>
+
+            <br />
+            <input className=" mx-2 p-1 rounded-md border-[1px] border-gray-500 outline-none" type="text" name="url" value={url} onChange={onChange} placeholder="input URL" />
+            <button onClick={() => {
+
+
+            }}
+                className=" bg-pink-400 rounded-md p-1"> 사이트 정보가져오기</button>
+
+            <br />
+            <button onClick={()=>{ getMyUrls()
+
+            }}
+            className=" bg-blue-300 p-1 rounded-md">get MyUrls </button>
 
         </div>
     )

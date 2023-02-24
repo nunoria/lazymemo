@@ -26,3 +26,11 @@ export const TagButton = ({ name, isActive, onClickEvent }) => {
         </button>
     )
 }
+
+export const TagButtonSm = ({name}) => {
+    return (
+        <button className="px-2 py-1 text-gray-500 text-xs bg-contents rounded-md h-fit">
+            {name}
+        </button>
+    )
+}

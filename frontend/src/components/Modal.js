@@ -1,27 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getKeyword } from './GetData';
+import { getKeyword, getHeader } from './GetData';
 import { Button, TagButton } from './Buttons';
+import { useUserStore, Url } from "store"
 
 const INPUT_TIMEOUT = 2000;
-
-let MY_TAG_TEST = [
-    {
-        tagname: "공부",
-        checked: false
-    },
-    {
-        tagname: "자바스크립트",
-        checked: false
-    },
-    {
-        tagname: "건강",
-        checked: false
-    },
-    {
-        tagname: "인테리어",
-        checked: false
-    },
-]
 
 const Modal = ({ modalCtl }) => {
 
@@ -29,7 +11,17 @@ const Modal = ({ modalCtl }) => {
     const [urlText, setUrlText] = useState('');
     const [addTagText, setAddTagText] = useState('');
     const [proposalTag, setProposalTag] = useState([]);
-    const [myTag, setMyTag] = useState(MY_TAG_TEST);
+    const [myTag, setMyTag] = useState([]);
+    const [urlInfo, setUrlInfo] = useState(null);
+
+    const { userTags, addTag, addMyUrl } = useUserStore();
+
+    useEffect(() => {
+        setMyTag(userTags.map((v) => ({ tagname: v, checked: false })));
+        return () => {
+            setMyTag([])
+        }
+    }, [])
 
     const onChangeAddTag = (e) => {
         setAddTagText(e.target.value);
@@ -48,8 +40,12 @@ const Modal = ({ modalCtl }) => {
         if (e.target.value.length < 5) return;
 
         setTimer(setTimeout(() => {
-            getKeyword(e.target.value)    // URL 을 넘겨서 키워드 배열 받아오기
+            getHeader(e.target.value)    // URL 을 헤더정보 받아오기
                 .then((response) => {
+
+                    setUrlInfo({ ...response });
+
+                    // 키워드가 있는경우 추천 해시태그로 보여주기
                     if (response.keywords) {
 
                         console.log(response.keywords)
@@ -97,7 +93,7 @@ const Modal = ({ modalCtl }) => {
                         <div className=' text-md font-semibold .text-theme-gray my-3'>해시태그를 선택해주세요.</div>
                         <div className=" min-h-[70px] w-full py-3 flex gap-2">
                             {/* 추천해시태그 블럭 */
-                                proposalTag.length>0 && proposalTag.map((v, i) => {
+                                proposalTag.length > 0 && proposalTag.map((v, i) => {
                                     return <TagButton name={v.tagname} key={i} isActive={v.checked}
                                         onClickEvent={
                                             (e) => {
@@ -113,7 +109,7 @@ const Modal = ({ modalCtl }) => {
                     <div>
                         <div className=" min-h-[70px] w-full py-3 flex gap-2 flex-wrap">
                             {/* 나의해시태그 블럭 */
-                                myTag.length>0 && myTag.map((v, i) => {
+                                myTag.length > 0 && myTag.map((v, i) => {
                                     return <TagButton name={v.tagname} key={i} isActive={v.checked}
                                         onClickEvent={
                                             (e) => {
@@ -130,17 +126,30 @@ const Modal = ({ modalCtl }) => {
                             <input type="text" name="hashtag" id="hashtag" placeholder='해시태그 이름을 입력해주세요' onChange={onChangeAddTag} value={addTagText}
                                 className='w-full h-[38px] px-4 rounded-xl border-[1px] border-gray-300 outline-none' />
                             <button onClick={() => {
-                                setMyTag([...myTag, {
-                                    tagname: addTagText,
-                                    checked: true
-                                }]);
+                                addTag(addTagText)
+                                    .then(() => {
+                                        setMyTag(
+                                            [...myTag,
+                                            {
+                                                tagname: addTagText,
+                                                checked: true
+                                            }
+                                            ]
+                                        )
+                                        setAddTagText("");
+                                    });
+
                             }}
                                 className=' bg-theme-yellow font-bold min-w-[45px] h-[45px] text-white rounded-lg'>+</button>
                         </div>
                     </div>
                 </div>
                 <div name="ModalSave" className='my-3'>
-                    <button onClick={() => { SendUrlWithTag([...proposalTag,...myTag], urlText) }}
+                    <button onClick={() => {
+                        addMyUrl(makeSendData([...proposalTag, ...myTag], urlInfo))
+                        .then(modalCtl(false))
+                        .catch(console.log("저장실패"));
+                    }}
                         className=' bg-theme-gray rounded-xl h-[48px] w-full text-center text-white font-semibold'>
                         <span>저장하기</span>
                         <img src={require("resource/logo_shape.svg").default} className="inline-block h-[18px] w-[18px] mx-2" alt="로고" />
@@ -151,27 +160,37 @@ const Modal = ({ modalCtl }) => {
     )
 }
 
-const SendUrlWithTag = (tagList, url) => {
+// 저장하기 버튼
+// url Class 인스턴스 새로 만들어야 함
 
-    if( tagList.length==0 || url.length==0){
-        console.log(tagList);
-        console.log(url);
+// 수정하기 버늩
+// 있는 url Class 인스턴스 사용
+
+const makeSendData = (tagList, urlInfo) => {
+
+    if (tagList.length == 0 || urlInfo == null) {
+        console.log("makeSendData(error): ", tagList);
+        console.log("makeSendData(error): ", urlInfo);
         //error
         return;
     }
 
     let tags = [];
-    tagList.forEach((v,i) => {
-        if(v.checked)tags.push(v.tagname);
+    tagList.forEach((v, i) => {
+        if (v.checked) tags.push(v.tagname);
     });
 
-    let sendData = {
-        tags: tags,
-        url: url
-    }
 
-    console.log("서버에 보내기---");
-    console.log(sendData);
+
+    let sendData = new Url({
+        tags: tags,
+        ...urlInfo,
+    })
+
+    console.log("makeSendData", sendData);
+    console.log("makeSendData. convert", sendData.convertToDbUrlData());
+
+    return sendData;
 
 }
 

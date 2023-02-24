@@ -2,28 +2,50 @@ import { useState } from "react";
 import axios from "axios";
 import * as cheerio from 'cheerio';
 const url = "https://yozm.wishket.com/magazine/detail/1851/";
+const url2 = "https://kim-solshar.tistory.com/57";
+const url3 = "https://blog.wishket.com/%EB%A7%A4%EA%B1%B0%EC%A7%84-%EA%B0%99%EC%9D%80-%EC%87%BC%ED%95%91%EB%AA%B0-29cm-ux-ui%ED%8E%B8/";
+
+
+// class UrlInfo  {
+//     constructor(urlString, title, siteName, keyword, description, image) {
+//         this.urlString = urlString;
+//         this.title = title;
+//         this.siteName = siteName;
+//         this.keyword = keyword;
+//         this.description = description
+//         this.image = image
+//     }
+
+// }
 
 async function getHeader(url) {
 
     let start = Date.now();
 
     try {
-        const response = await axios.get(url);
-        const $ = cheerio.load(response.data);
+        const html = await axios.get(url);
+        const $ = cheerio.load(html.data);
 
-        let header = {};
-        header.title = $('meta[property="og:title"]').attr('content');
-        header.site_name = $('meta[property="og:site_name"]').attr('content');
-        header.keyword = $('meta[property="og:keyword"]').attr('content');
-        header.description = $('meta[property="og:description"]').attr('content');
-        header.image = $('meta[property="og:image"]').attr('content');
+        let urlInfo = {};
+        urlInfo.title = $('meta[property="og:title"]').attr('content');
+        urlInfo.keyword = $('meta[property="og:keyword"]').attr('content');
+        urlInfo.description = $('meta[property="og:description"]').attr('content');
+        urlInfo.image = $('meta[property="og:image"]').attr('content');
+        urlInfo.url = url
+        // urlInfo.siteName = $('meta[property="og:site_name"]').attr('content'); // site_name 에 대해서 작동 안함.
+        urlInfo.siteName = $('meta').filter((i, el) => {
+            return $(el).attr('property') === "og:site_name"
+        }).attr('content')
 
-        console.log(header);
+        console.log($);
+        console.log(urlInfo);
 
         let end = Date.now();
         console.log(`경과시간: ${end - start}ms`);
 
-        return header;
+
+
+        return urlInfo;
 
     } catch (err) {
         console.log("Error>>", err);
@@ -68,25 +90,54 @@ async function getKeyword(url) {
 
 }
 
+export const getUrlTest = async (url) => {
+    let start = Date.now();
+
+    let urlInfo = {};
+
+    try {
+        const html = await axios.get(url);
+        const $ = cheerio.load(html.data);
+
+        // og:site_name 만 가져옴
+        // let siteName = $('meta').filter((i, el) => {
+        //     return $(el).attr('property') === "og:site_name"
+        // }).attr('content');
+
+        // meta 태그에서 og: 로 시작하는 태그들의 content 를 키,값의 객체로 가져옴
+        $('meta').each((i, el) => {
+            let props = $(el).attr('property')?.split(':');
+            if (props && props[0] === "og") {
+                urlInfo[props[1]] = $(el).attr('content');
+            }
+        })
+
+        $('meta').each((i, el) => {
+            console.log(i, $(el).attr('property'),$(el).attr('content'))
+        })
+
+
+
+        console.log(urlInfo);
+
+        let end = Date.now();
+        console.log(`경과시간: ${end - start}ms`);
+
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 export default function GetURLInfo() {
 
 
-    // let post_data = {
-    //     url : url,
-    //     user : "이기범"
-    // }
-
-    // axios.post("/api/header", post_data).then((response) => {
-
-    //     console.log(response.data);
-    // })
 
     return (
         <div>
             <button className=" bg-green-400 p-2 rounded-lg" onClick={() => {
                 console.log("GetURLInfo");
-                getHeader(url).then((res) => console.log(res));
+                getUrlTest(url3);
+                // getHeader(url).then((res) => console.log(res));
             }}>데이터 가져오기</button>
         </div>
     )

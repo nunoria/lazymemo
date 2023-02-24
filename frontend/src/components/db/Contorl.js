@@ -1,7 +1,8 @@
 
 import { getFirestore, addDoc, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 
-const USER_COLLECTIONS_NAME = "users"
+const USERS_COLLECTION_NAME = "users"
+const MYURLS_COLLECTION_NAME = "myUrls"
 
 /*
 Doc 에 접근하기 위해서는 Ref가 필요한데,
@@ -12,7 +13,7 @@ Doc id로 다시 Doc ref를 찾아야 함
 const getUserDocById = async (userId) => {
 
     const db = getFirestore();
-    const q = query(collection(db, "users"), where("userId", "==", userId));
+    const q = query(collection(db, USERS_COLLECTION_NAME), where("userId", "==", userId));
 
     try {
         const querySnapshot = await getDocs(q);
@@ -23,24 +24,43 @@ const getUserDocById = async (userId) => {
 
         if (querySnapshot.empty) { // ID 가 DB에 존재 하지 않음
             console.log("ID does not exist.! create empty user document!");
-            const newDocRef = await addDoc(collection(db, USER_COLLECTIONS_NAME), {userId:userId});
+            const newDocRef = await addDoc(collection(db, USERS_COLLECTION_NAME), { userId: userId });
             console.log(`created document id => ${newDocRef.id}`);
             return { docRef: newDocRef, docData: null };
 
         } else { // ID 가 DB에 존재함, 현재 여러개가 있을경우 마지막것을 가져오게 되어 있음.(수정필요)
-            let docId ="";
-            let docData ="";
+            let docId = "";
+            let docData = "";
             querySnapshot.forEach((docSnap) => {
                 docId = docSnap.id;
                 docData = docSnap.data();
             });
-            const docRef = doc(db, USER_COLLECTIONS_NAME, docId);
+            const docRef = doc(db, USERS_COLLECTION_NAME, docId);
             console.log(`document id => ${docRef.id}`);
             return { docRef: docRef, docData: docData };
         }
     } catch (error) {
-        console.log("error getUserDocData :", error);
+        console.log("error getUserDocById :", error);
     }
+}
+
+const getMyUrlsDocs = async (userDbRef) => {
+
+    try {
+        const querySnapshot = await getDocs(collection(userDbRef, MYURLS_COLLECTION_NAME));
+
+        let res = [];
+        querySnapshot.forEach((docSnap) => {
+            let docData = docSnap.data();
+            let docRef = doc(userDbRef, MYURLS_COLLECTION_NAME, docSnap.id);
+            res.push({ docRef: docRef, docData: docData });
+        })
+
+        return res;
+    } catch (error) {
+        console.log('error getMyUrlsDocs :', error);
+    }
+
 }
 
 /*
@@ -76,4 +96,11 @@ const getUserDoc = async (DocRef) => {
     return docSnap.data();
 }
 
-export { getUserDocById, updateUserDoc, setUserDoc }
+const addMyUrlsDoc = async (userDbRef, urlData) => {
+
+    const newUrlRef = await addDoc(collection(userDbRef, MYURLS_COLLECTION_NAME), urlData);
+
+    return newUrlRef;
+}
+
+export { getUserDocById, updateUserDoc, setUserDoc, addMyUrlsDoc, getMyUrlsDocs }

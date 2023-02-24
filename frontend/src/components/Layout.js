@@ -26,7 +26,10 @@ export const Top = () => {
 export const Main = () => {
     const auth = getAuth();
 
-    const { setUser, isLogin, clearUser } = useUserStore();
+    let cardInfos = Array.from({length: 10}, (v, i) => i+1); // i(index) 1씩 증가
+
+
+    const { setUser, isLogin, clearUser, myUrls, allUrls } = useUserStore();
 
     useEffect(() => {
         auth.onAuthStateChanged((res) => {
@@ -60,7 +63,7 @@ export const Main = () => {
                         <main>
                             <Dashboard />
                             <TagList />
-                            <CardList />
+                            <CardList cardInfos={myUrls}/>
                         </main>
                     ) :
                     (
@@ -73,7 +76,7 @@ export const Main = () => {
                 <main>
                     <Slide />
                     <TagList />
-                    <CardList />
+                    <CardList cardInfos={allUrls} />
                 </main>
             } />
             <Route path="setting" element={"setting"} />
