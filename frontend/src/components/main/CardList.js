@@ -1,27 +1,64 @@
 import { TagButtonSm } from 'components/Buttons'
 import React, { useState } from 'react';
+import { useUserStore } from "store"
+import Modal from 'components/Modal';
 
+export default function CardList({ cardInfos, isMyUrl }) {
 
-export default function CardList({ cardInfos }) {
+    const [modalState, setModalState] = useState(false);
+    const [modalUrl, setModalUrl] = useState(null);
 
+    const modalCtl = (onOff) => {
+        if (!onOff)
+            setModalUrl(null);
+        setModalState(onOff);
+    }
+
+    const { delMyUrl } = useUserStore();
+    const ctlStore = {
+        del: delMyUrl,
+    }
 
     return (
-        <div className="bg-contents flex justify-center py-5">
-            <div className="pbox grid grid-cols-[minmax(280px,_1fr)] lg:grid-cols-3 md:grid-cols-2 gap-5 xl:gap-8">
-                {
-                    cardInfos.length > 0 && cardInfos.map((v, id) => {
-                        return (
-                            <Card key={id} cardInfo={v} />
-                        )
-                    })
-                }
+        <>
+            {
+                modalState && <Modal modalCtl={modalCtl} url={modalUrl} />
+            }
+            <div className="bg-contents flex justify-center py-5">
+                <div className="pbox grid grid-cols-[minmax(280px,_1fr)] lg:grid-cols-3 md:grid-cols-2 gap-5 xl:gap-8">
+                    {
+                        isMyUrl && <AddCard modalCtl={modalCtl} />
+                    }
+                    {
+                        cardInfos.length > 0 && cardInfos.map((v, id) => {
+                            return (
+                                <Card key={id} cardInfo={v} ctlStore={ctlStore} modalCtl={modalCtl} setModalUrl={setModalUrl} />
+                            )
+                        })
+                    }
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 
+const AddCard = ({ modalCtl }) => {
+    return (
+        <>
+            <div className="hover:-translate-y-4 transition duration-500 ease-in-out 
+            bg-gray-100 rounded-2xl aspect-square overflow-hidden
+            flex flex-col justify-center items-center cursor-pointer 
+            border border-dashed border-gray-400 text-gray-400
+            hover:border-theme-yellow hover:text-theme-yellow" onClick={() => { modalCtl(true) }}>
+                <div className=' text-lg'>
+                    URL 추가하기
+                </div>
+            </div>
+        </>
+    )
+}
 
-const Card = ({ cardInfo }) => {
+const Card = ({ cardInfo, ctlStore, modalCtl, setModalUrl }) => {
     const [popUpVisible, setPopUpVisible] = useState({});
 
     const onMouseOver = (e) => {
@@ -41,7 +78,6 @@ const Card = ({ cardInfo }) => {
         setPopUpVisible({})
     }
 
-
     return (
         < >
             <div className="hover:-translate-y-4 transition duration-500 ease-in-out bg-white rounded-2xl aspect-square overflow-hidden
@@ -58,7 +94,12 @@ const Card = ({ cardInfo }) => {
                         </div>
                         <div>
                             <img src={require('resource/edit.svg').default} alt="edit"
-                                name="정보 수정하기" onMouseOver={onMouseOver} onMouseOut={onMouseOut} />
+                                name="정보 수정하기" onMouseOver={onMouseOver} onMouseOut={onMouseOut}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setModalUrl(cardInfo);
+                                    modalCtl(true);
+                                }} />
                         </div>
                     </div>
                     <div name="titleWrapper" className=" basis-1/3">
@@ -70,7 +111,7 @@ const Card = ({ cardInfo }) => {
                             <div className="tracking-tight text-sm text-gray-400"><span>{cardInfo.created.toLocaleDateString()}</span></div>
                             <div className="flex flex-row gap-2">
                                 <img className="w-[20px] h-[20px] mt-[2px]" src={require('resource/logo_shape.svg').default} alt="store"
-                                    name="저장 해제하기" onMouseOver={onMouseOver} onMouseOut={onMouseOut} />
+                                    name="저장 해제하기" onMouseOver={onMouseOver} onMouseOut={onMouseOut} onClick={(e) => { e.stopPropagation(); ctlStore.del(cardInfo) }} />
                                 <img src={require('resource/more.svg').default} alt="more" name="더보기"
                                     onMouseOver={onMouseOver} onMouseOut={onMouseOut} />
                             </div>

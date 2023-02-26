@@ -1,5 +1,5 @@
 
-import { getFirestore, addDoc, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { getFirestore, addDoc, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
 
 const USERS_COLLECTION_NAME = "users"
 const MYURLS_COLLECTION_NAME = "myUrls"
@@ -44,37 +44,22 @@ const getUserDocById = async (userId) => {
     }
 }
 
-const getMyUrlsDocs = async (userDbRef) => {
+export const getMyUrlsDocs = async (userDbRef) => {
 
-    try {
-        const querySnapshot = await getDocs(collection(userDbRef, MYURLS_COLLECTION_NAME));
+    const querySnapshot = await getDocs(collection(userDbRef, MYURLS_COLLECTION_NAME));
+    let res = [];
 
-        let res = [];
-        querySnapshot.forEach((docSnap) => {
-            let docData = docSnap.data();
-            docData.created = docData.created?.toDate();
-            let docRef = doc(userDbRef, MYURLS_COLLECTION_NAME, docSnap.id);
-            res.push({ docRef: docRef, docData: docData });
-        })
+    querySnapshot.forEach((docSnap) => {
+        let docData = docSnap.data();
+        docData.created = docData.created?.toDate();
+        let docRef = doc(userDbRef, MYURLS_COLLECTION_NAME, docSnap.id);
+        res.push({ docRef: docRef, docData: docData });
+    })
 
-        return res;
-    } catch (error) {
-        console.log('error getMyUrlsDocs :', error);
-    }
-
+    return res;
 }
 
-/*
-기존 데이터에
-속성이 없으면 추가,
-속성이 있으면 교체
-*/
-const updateUserDoc = async (userDbRef, userData) => {
-    try {
-        await updateDoc(userDbRef, userData); // promise void return
-        console.log("udateUserDoc");
-    } catch (e) { console.log(e); }
-}
+
 
 /*
 기존 데이터를 지우고
@@ -86,7 +71,7 @@ const setUserDoc = async (userDbRef, userData) => {
         const response = await setDoc(userDbRef, userData);
         console.log("setUserDoc : ", response);
         return response;
-    } catch (e) { console.log(e); }
+    } catch (error) { console.log(error); }
 }
 
 const getUserDoc = async (DocRef) => {
@@ -97,11 +82,35 @@ const getUserDoc = async (DocRef) => {
     return docSnap.data();
 }
 
-const addMyUrlsDoc = async (userDbRef, urlData) => {
+/*
+기존 데이터에
+속성이 없으면 추가,
+속성이 있으면 교체
+새로운 데이터에 없는 속성은 변경되지 않음
+*/
+export const updateUserDoc = async (userDbRef, userData) => {
 
-    const newUrlRef = await addDoc(collection(userDbRef, MYURLS_COLLECTION_NAME), urlData);
-
-    return newUrlRef;
+    await updateDoc(userDbRef, userData); // promise void return
 }
 
-export { getUserDocById, updateUserDoc, setUserDoc, addMyUrlsDoc, getMyUrlsDocs }
+export const addMyUrlsDoc = async (userDbRef, urlData) => {
+
+    const response = await addDoc(collection(userDbRef, MYURLS_COLLECTION_NAME), urlData);
+    return response;
+}
+
+export const setMyUrlsDoc = async (urlDbRef, urlData) => {
+
+    console.log('urlData:', urlData);
+    const response = await setDoc(urlDbRef, urlData);
+    return response;
+}
+
+export const delMyUrlsDoc = async (urlDbRef) => {
+
+    console.log('urlDbRef:', urlDbRef);
+    const response = await deleteDoc(urlDbRef);
+    return response;
+}
+
+export { getUserDocById, setUserDoc }

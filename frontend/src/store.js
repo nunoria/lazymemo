@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import * as _ from 'lodash'
-import { getUserDocById, updateUserDoc, setUserDoc, addMyUrlsDoc, getMyUrlsDocs } from 'components/db/Contorl'
+import { getUserDocById, updateUserDoc, setMyUrlsDoc, setUserDoc, addMyUrlsDoc, getMyUrlsDocs, delMyUrlsDoc } from 'components/db/Contorl'
 
 const userInitialDbInfo = {
     deadline: 7,
@@ -34,8 +34,8 @@ export class Url {
         this.tags = tags;
     }
 
-    static createNew (item) {
-        return new Url({...item, created: new Date()})
+    static createNew(item) {
+        return new Url({ ...item, created: new Date() })
     }
 
     get url() {
@@ -142,7 +142,7 @@ export const useUserStore = create((set, get) => ({
             console.log('tag:', tag);
             console.log(typeof tag);
 
-            if (!(typeof tag === 'string') || (tag.length < 1)) {
+            if (!(typeof tag === 'string') || (tag.length < 2)) {
                 throw new Error("A tag must be a string of length greater than 1.");
             }
 
@@ -150,11 +150,12 @@ export const useUserStore = create((set, get) => ({
 
             await updateUserDoc(get().userDbRef, { userTags: newTags });
 
-            set({ userTags: newTags })
+            set({ userTags: newTags });
 
             return newTags;
         } catch (error) {
             console.log("error addTag :", error);
+            throw new Error("add Tag Failed");
         }
     },
     addMyUrl: async (urlInfo) => {
@@ -168,19 +169,9 @@ export const useUserStore = create((set, get) => ({
                 throw new Error("urlInfo param is required.")
             }
 
-            // // DB에 undefined 는 저장 안됨.
-            // for (let key in urlInfo) {
-            //     if (urlInfo[key] == undefined || urlInfo[key] == null)
-            //         urlInfo[key] = "";
-            // }
-
-            let newUrl = Url.createNew(urlInfo)
+            let newUrl = Url.createNew(urlInfo);
 
             newUrl.urlDbRef = await addMyUrlsDoc(get().userDbRef, newUrl.convertToDbUrlData());
-
-            if (newUrl.urlDbRef == null) {
-                throw new Error("add to DB is failed.")
-            }
 
             console.log('addMyUrl: success!', newUrl);
 
@@ -193,6 +184,32 @@ export const useUserStore = create((set, get) => ({
 
         } catch (error) {
             console.log('error addMyUrl :', error);
+            throw new Error("addMyUrl is failed!");
+        }
+    },
+    delMyUrl: async (url) => {
+        try {
+            await delMyUrlsDoc(url.urlDbRef);
+
+            let newMyUrls = get().myUrls.filter( item => item != url);
+            console.log('newMyUrls:', newMyUrls);
+            set({myUrls:newMyUrls});
+
+        } catch (error) {
+            console.log('error delMyUrl :', error);
+        }
+    },
+    modMyUrl: async (url) => {
+        try {
+            await setMyUrlsDoc(url.urlDbRef, url.convertToDbUrlData());
+
+            // 이미 Url 정보는 바뀌어 있으니, set 에 새로운 배열로 업데이트만 해주면 됨
+            set({myUrls:[...(get().myUrls)]});
+
+        } catch (error) {
+            get().getMyUrls(); // DB 에서 다시 읽어 온다.
+            console.log('error modMyUrl :', error);
+            throw new Error("modification myUrl is failed!");
         }
     },
     getMyUrls: async () => {
@@ -202,10 +219,12 @@ export const useUserStore = create((set, get) => ({
 
             let res = await getMyUrlsDocs(get().userDbRef);
 
+            console.log('getMyUrls: get Data', res)
+
             set(() => ({
                 myUrls: res.map((item) => {
                     let tmpUrl = new Url(item.docData);
-                    tmpUrl.urlDbRef = item.docRef
+                    tmpUrl.urlDbRef = item.docRef;
                     return tmpUrl;
                 })
             }))
@@ -213,7 +232,6 @@ export const useUserStore = create((set, get) => ({
         } catch (error) {
             console.log('error getMyUrls :', error);
         }
-
     }
 
 }))

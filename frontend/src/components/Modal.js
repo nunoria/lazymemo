@@ -4,27 +4,60 @@ import { Button, TagButton } from './Buttons';
 import { useUserStore, Url } from "store"
 
 const INPUT_TIMEOUT = 2000;
+const N_MAXTAGS = 4;
+const N_MINTAGLENGTH = 2;
 
-const Modal = ({ modalCtl }) => {
+const Modal = ({ modalCtl, url }) => {
 
     const [timer, setTimer] = useState(null);
     const [urlText, setUrlText] = useState('');
+    const [subjectText, setSubjectText] = useState('');
     const [addTagText, setAddTagText] = useState('');
     const [proposalTag, setProposalTag] = useState([]);
     const [myTag, setMyTag] = useState([]);
     const [urlInfo, setUrlInfo] = useState(null);
+    const [opacity, setOpacity] = useState(" opacity-0");
+    const [maxTagWarn, setMaxTagWarn] = useState(false);
+    const [tagLenWarn, setTagLenWarn] = useState(false);
 
-    const { userTags, addTag, addMyUrl } = useUserStore();
+    const { userTags, addTag, addMyUrl, modMyUrl } = useUserStore();
 
     useEffect(() => {
-        setMyTag(userTags.map((v) => ({ tagname: v, checked: false })));
+        if (url) {
+            setMyTag(userTags.map((v) => {
+                if (url.tags.find(item => item == v) != undefined)
+                    return { tagname: v, checked: true };
+                return { tagname: v, checked: false };
+            }));
+            setSubjectText(url.title);
+        } else {
+            setMyTag(userTags.map((v) => ({ tagname: v, checked: false })));
+        }
         return () => {
             setMyTag([])
         }
-    }, [])
+    }, []);
 
-    const onChangeAddTag = (e) => {
-        setAddTagText(e.target.value);
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        setOpacity(" opacity-100")
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, []);
+
+    const onChange = (event) => {
+        const {
+            target: {
+                name,
+                value,
+            },
+        } = event;
+        if (name == "subjectText") setSubjectText(value);
+        if (name == "addTagText") {
+            value.length < N_MINTAGLENGTH ? setTagLenWarn(true) : setTagLenWarn(false);
+            setAddTagText(value);
+        }
     }
 
     const onChangeUrl = (e) => {
@@ -61,36 +94,43 @@ const Modal = ({ modalCtl }) => {
         }, INPUT_TIMEOUT));
     }
 
-    useEffect(() => {
-        console.log("scroll hidden");
-        document.body.style.overflow = 'hidden';
-        return () => {
-            console.log("scroll auto");
-            document.body.style.overflow = 'auto';
-        };
-    }, []);
+
 
     return (
-        <div className=' left-0 top-0 w-screen h-screen fixed'>
-            <div className=' bg-black top-0 left-0 w-full h-full opacity-50 fixed z-10' onClick={() => { modalCtl(false) }}>{/* 그레이 배경 */} </div>
-            <div className="bg-white rounded-xl w-[600px] p-8 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20
-            flex flex-col">
+        <div className={'left-0 top-0 w-screen h-screen fixed z-10 transition duration-300 ease-in-out' + opacity} >
+            <div className='bg-black top-0 left-0 w-full h-full opacity-50 fixed z-10 ' onClick={() => { modalCtl(false) }}>{/* 그레이 배경 */} </div>
+            <div className='bg-white rounded-xl w-[600px] p-8 flex flex-col
+            absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20'>
                 <div name="ModalHeader" className='relative pt-5 pb-9' >
                     <button type='button' className=' absolute -right-4 -top-4' onClick={() => { modalCtl(false) }}>
                         <img src={require('resource/cancel.svg').default} alt="close" />
                     </button>
                     <img src={require('resource/logo.svg').default} alt="logo" />
 
-                    <body className='text-3xl font-extrabold pt-2'>URLTAG에 저장해 둘께요!</body>
+                    <div className='text-3xl font-extrabold pt-2'>
+                        {
+                            url ? "이 URL의 정보를 변경해주세요!" : "URLTAG에 저장해 둘께요!"
+                        }
+                    </div>
                 </div>
                 <div name="ModalBody" className='my-5'>
                     <div>
-                        <div className=' text-md font-semibold .text-theme-gray mb-3'>URL 정보를 입력해주세요</div>
-                        <input type="text" name="url" id="url" placeholder="URL 주소를 입력해주세요." onChange={onChangeUrl} value={urlText}
-                            className='w-full h-[38px] px-4 rounded-xl border-[1px] border-gray-300 outline-none' />
+                        <div className=' text-md font-semibold .text-theme-gray mb-3'>
+                            {url ? "제목을 수정해주세요" : "URL 정보를 입력해주세요"}
+                        </div>
+                        {url
+                            ? <input type="text" name="subjectText" id="subjectText" placeholder="제목을 수정해주세요" onChange={onChange} value={subjectText}
+                                className='w-full h-[38px] px-4 rounded-xl border-[1px] border-gray-300 outline-none' />
+                            : <input type="text" name="url" id="url" placeholder="URL 주소를 입력해주세요." onChange={onChangeUrl} value={urlText}
+                                className='w-full h-[38px] px-4 rounded-xl border-[1px] border-gray-300 outline-none' />
+                        }
+
                     </div>
                     <div className='border-b-[1px] border-gray-300'>
-                        <div className=' text-md font-semibold .text-theme-gray my-3'>해시태그를 선택해주세요.</div>
+                        <div className='flex flex-row gap-2 items-center'>
+                            <div className=' text-md font-semibold .text-theme-gray my-3'>해시태그를 선택해주세요.</div>
+                            {maxTagWarn && <div className='text-sm font-semibold text-red-500'> 태그를 4개 이상 선택할수 없습니다! </div>}
+                        </div>
                         <div className=" min-h-[70px] w-full py-3 flex gap-2">
                             {/* 추천해시태그 블럭 */
                                 proposalTag.length > 0 && proposalTag.map((v, i) => {
@@ -113,17 +153,26 @@ const Modal = ({ modalCtl }) => {
                                     return <TagButton name={v.tagname} key={i} isActive={v.checked}
                                         onClickEvent={
                                             (e) => {
+                                                // 태그를 Active로 바꾸기 전에 Active된 태그의 갯수 확인후 MAXTAGS 를 넘어가면 리턴
+                                                if (v.checked == false) {
+                                                    let checked = myTag.filter(item => (item.checked == true));
+                                                    if (checked.length >= N_MAXTAGS) return setMaxTagWarn(true);
+                                                }
                                                 let prevMyTag = [...myTag];
                                                 prevMyTag[i].checked = !prevMyTag[i].checked;
                                                 setMyTag(prevMyTag);
+                                                setMaxTagWarn(false);
                                             }
                                         } />
                                 })
                             }
                         </div>
-                        <div className=' text-md font-semibold .text-theme-gray my-3'>원하는 해시태그가 없으신가요?</div>
+                        <div className='flex flex-row gap-2 items-center'>
+                            <div className=' text-md font-semibold .text-theme-gray my-3'>원하는 해시태그가 없으신가요?</div>
+                            {tagLenWarn && <div className='text-sm font-semibold text-red-500'> 태그는 2글자 이상입니다 </div>}
+                        </div>
                         <div className='flex flex-row gap-2 justify-between items-center'>
-                            <input type="text" name="hashtag" id="hashtag" placeholder='해시태그 이름을 입력해주세요' onChange={onChangeAddTag} value={addTagText}
+                            <input type="text" name="addTagText" id="addTagText" placeholder='해시태그 이름을 입력해주세요' onChange={onChange} value={addTagText}
                                 className='w-full h-[38px] px-4 rounded-xl border-[1px] border-gray-300 outline-none' />
                             <button onClick={() => {
                                 addTag(addTagText)
@@ -137,8 +186,8 @@ const Modal = ({ modalCtl }) => {
                                             ]
                                         )
                                         setAddTagText("");
-                                    });
-
+                                    })
+                                    .catch(err => console.log('Modal err:', err))
                             }}
                                 className=' bg-theme-yellow font-bold min-w-[45px] h-[45px] text-white rounded-lg'>+</button>
                         </div>
@@ -146,9 +195,18 @@ const Modal = ({ modalCtl }) => {
                 </div>
                 <div name="ModalSave" className='my-3'>
                     <button onClick={() => {
-                        addMyUrl({ ...urlInfo, tags: makeTagsArray([...proposalTag, ...myTag]) })
-                            .then(modalCtl(false))
-                            .catch(console.log("저장실패"));
+                        if (url) {
+                            url.title = subjectText;
+                            url.tags = makeTagsArray([...proposalTag, ...myTag]);
+                            modMyUrl(url)
+                                .then(modalCtl(false))
+                                .catch(err => console.log('Modal err', err));
+                        }
+                        else {
+                            addMyUrl({ ...urlInfo, tags: makeTagsArray([...proposalTag, ...myTag]) })
+                                .then(modalCtl(false))
+                                .catch(err => console.log('Modal err', err))
+                        }
                     }}
                         className=' bg-theme-gray rounded-xl h-[48px] w-full text-center text-white font-semibold'>
                         <span>저장하기</span>
@@ -156,7 +214,7 @@ const Modal = ({ modalCtl }) => {
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

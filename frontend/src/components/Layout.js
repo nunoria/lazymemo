@@ -63,7 +63,7 @@ export const Main = () => {
                         <main>
                             <Dashboard />
                             <TagList />
-                            <CardList cardInfos={myUrls}/>
+                            <CardList cardInfos={myUrls} isMyUrl={true}/>
                         </main>
                     ) :
                     (
