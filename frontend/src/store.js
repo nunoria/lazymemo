@@ -138,7 +138,7 @@ export const useUserStore = create((set, get) => ({
     setUserTagsChecked: (tag, check) => {
         let newUserTagsChecked = [...(get().userTagsChecked)];
 
-        console.log(tag, check)
+        // console.log(tag, check)
 
         if (check)
             newUserTagsChecked.push(tag);
@@ -147,7 +147,11 @@ export const useUserStore = create((set, get) => ({
             newUserTagsChecked.splice(idx,1);
         }
 
-        set({ userTagsChecked: newUserTagsChecked })
+        set({ userTagsChecked: newUserTagsChecked });
+    },
+    clearUserTagsChecked: () =>{
+        console.log("clear userTagsChecked");
+        set({userTagsChecked: []});
     },
     addTag: async (tag) => {
         try {
