@@ -18,6 +18,7 @@ const initUserStore = {
     userDbRef: null,
     userMainTags: [],
     userTags: [],
+    userTagsChecked: [],
     myUrls: []
 }
 
@@ -95,6 +96,7 @@ export const useUserStore = create((set, get) => ({
     userDbRef: null,    // firebase DB doc instance
     userMainTags: [],
     userTags: [],
+    userTagsChecked: [],
     myUrls: [],
     allUrls: [],
 
@@ -132,6 +134,20 @@ export const useUserStore = create((set, get) => ({
     clearUser: () => set(initUserStore),
     logUserInfo: () => {
         console.log(get());
+    },
+    setUserTagsChecked: (tag, check) => {
+        let newUserTagsChecked = [...(get().userTagsChecked)];
+
+        console.log(tag, check)
+
+        if (check)
+            newUserTagsChecked.push(tag);
+        else {
+            let idx = newUserTagsChecked.indexOf(tag);
+            newUserTagsChecked.splice(idx,1);
+        }
+
+        set({ userTagsChecked: newUserTagsChecked })
     },
     addTag: async (tag) => {
         try {
@@ -191,9 +207,9 @@ export const useUserStore = create((set, get) => ({
         try {
             await delMyUrlsDoc(url.urlDbRef);
 
-            let newMyUrls = get().myUrls.filter( item => item != url);
+            let newMyUrls = get().myUrls.filter(item => item != url);
             console.log('newMyUrls:', newMyUrls);
-            set({myUrls:newMyUrls});
+            set({ myUrls: newMyUrls });
 
         } catch (error) {
             console.log('error delMyUrl :', error);
@@ -204,7 +220,7 @@ export const useUserStore = create((set, get) => ({
             await setMyUrlsDoc(url.urlDbRef, url.convertToDbUrlData());
 
             // 이미 Url 정보는 바뀌어 있으니, set 에 새로운 배열로 업데이트만 해주면 됨
-            set({myUrls:[...(get().myUrls)]});
+            set({ myUrls: [...(get().myUrls)] });
 
         } catch (error) {
             get().getMyUrls(); // DB 에서 다시 읽어 온다.

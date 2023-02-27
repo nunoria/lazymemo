@@ -41,8 +41,8 @@ export const TagButton = ({ name, isActive, onClick }) => {
     const inActiveClass = "text-theme-gray bg-white";
 
     return (
-        <button onClick={onClick}
-            className={"px-6 py-1 font-pretandard font-bold text-sm rounded-2xl h-fit " + (isActive ? activeClass : inActiveClass)}>
+        <button onClick={onClick} name={name} value={isActive}
+            className={"px-6 py-1 font-pretandard font-medium text-sm rounded-2xl h-fit " + (isActive ? activeClass : inActiveClass)}>
             {name}
         </button>
     )
