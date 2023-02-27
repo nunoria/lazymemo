@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getKeyword, getHeader } from './GetData';
-import { Button, TagButton } from './Buttons';
+import { Button, ModalTagButton } from './Buttons';
 import { useUserStore, Url } from "store"
 
 const INPUT_TIMEOUT = 2000;
@@ -134,7 +134,7 @@ const Modal = ({ modalCtl, url }) => {
                         <div className=" min-h-[70px] w-full py-3 flex gap-2">
                             {/* 추천해시태그 블럭 */
                                 proposalTag.length > 0 && proposalTag.map((v, i) => {
-                                    return <TagButton name={v.tagname} key={i} isActive={v.checked}
+                                    return <ModalTagButton name={v.tagname} key={i} isActive={v.checked}
                                         onClickEvent={
                                             (e) => {
                                                 let prevPoeposalTag = [...proposalTag];
@@ -150,7 +150,7 @@ const Modal = ({ modalCtl, url }) => {
                         <div className=" min-h-[70px] w-full py-3 flex gap-2 flex-wrap">
                             {/* 나의해시태그 블럭 */
                                 myTag.length > 0 && myTag.map((v, i) => {
-                                    return <TagButton name={v.tagname} key={i} isActive={v.checked}
+                                    return <ModalTagButton name={v.tagname} key={i} isActive={v.checked}
                                         onClickEvent={
                                             (e) => {
                                                 // 태그를 Active로 바꾸기 전에 Active된 태그의 갯수 확인후 MAXTAGS 를 넘어가면 리턴

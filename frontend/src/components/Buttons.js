@@ -9,12 +9,12 @@ export const Button = ({ name, isActive, onClickEvent }) => {
     return (
         <button onClick={onClickEvent}
             className={"px-4 py-3 font-pretandard font-bold text-sm rounded-3xl " + (isActive ? activeClass : inActiveClass)} >
-            <span>{name}</span>
+            {name}
         </button>
     )
 }
 
-export const TagButton = ({ name, isActive, onClickEvent }) => {
+export const ModalTagButton = ({ name, isActive, onClickEvent }) => {
 
     const activeClass = "bg-theme-yellow text-white border-yellow-400";
     const inActiveClass = "text-gray-400 border-gray-400";
@@ -22,15 +22,29 @@ export const TagButton = ({ name, isActive, onClickEvent }) => {
     return (
         <button onClick={onClickEvent}
             className={"px-6 py-1 font-pretandard font-bold text-sm rounded-2xl border-[1px] h-fit " + (isActive ? activeClass : inActiveClass)}>
-            <span>{name}</span>
+            {name}
         </button>
     )
 }
 
-export const TagButtonSm = ({name}) => {
+export const ModalTagButtonSm = ({name}) => {
     return (
         <button className="px-2 py-1 text-gray-500 text-xs bg-contents rounded-md h-fit">
             {name}
         </button>
     )
 }
+
+export const TagButton = ({ name, isActive, onClick }) => {
+
+    const activeClass = "text-white bg-theme-gray";
+    const inActiveClass = "text-theme-gray bg-white";
+
+    return (
+        <button onClick={onClick}
+            className={"px-6 py-1 font-pretandard font-bold text-sm rounded-2xl h-fit " + (isActive ? activeClass : inActiveClass)}>
+            {name}
+        </button>
+    )
+}
+

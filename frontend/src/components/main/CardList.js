@@ -1,4 +1,4 @@
-import { TagButtonSm } from 'components/Buttons'
+import { ModalTagButtonSm } from 'components/Buttons'
 import React, { useState } from 'react';
 import { useUserStore } from "store"
 import Modal from 'components/Modal';
@@ -89,7 +89,7 @@ const Card = ({ cardInfo, ctlStore, modalCtl, setModalUrl }) => {
                     <div className="basis-1/3 flex flex-row justify-between items-center">
                         <div name="tagWrapper" className="  flex flex-row gap-3 ">
                             {
-                                cardInfo.tags.map((v, i) => (<TagButtonSm name={v} key={i} />))
+                                cardInfo.tags.map((v, i) => (<ModalTagButtonSm name={v} key={i} />))
                             }
                         </div>
                         <div>
