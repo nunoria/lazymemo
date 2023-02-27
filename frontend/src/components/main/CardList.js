@@ -14,7 +14,7 @@ export default function CardList({ cardInfos, isMyUrl }) {
         setModalState(onOff);
     }
 
-    const { delMyUrl } = useUserStore();
+    const { delMyUrl, userTagsChecked } = useUserStore();
     const ctlStore = {
         del: delMyUrl,
     }
@@ -31,6 +31,10 @@ export default function CardList({ cardInfos, isMyUrl }) {
                     }
                     {
                         cardInfos.length > 0 && cardInfos.map((v, id) => {
+                            if(userTagsChecked.length > 0) {
+                                let intersection = v.tags.filter( item => userTagsChecked.includes(item))
+                                if(intersection.length == 0 ) return;
+                            }
                             return (
                                 <Card key={id} cardInfo={v} ctlStore={ctlStore} modalCtl={modalCtl} setModalUrl={setModalUrl} />
                             )
