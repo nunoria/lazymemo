@@ -2,13 +2,13 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { getAuth } from "firebase/auth";
-import { useUserStore } from "store"
+import { useUserStore, useTestAuthStore } from "store"
 import Navi from "./Navi";
 import Dashboard from "./main/Dashboard";
 import TagList from "./main/TagList";
 import CardList from "./main/CardList";
 import Slide from "./main/Slide";
-import Login from "./main/Login";
+import Login, {TestLogin} from "./main/Login";
 
 
 const TOP_HEIGHT = "87px";
@@ -29,15 +29,34 @@ export const Main = () => {
     let cardInfos = Array.from({length: 10}, (v, i) => i+1); // i(index) 1씩 증가
 
 
-    const { setUser, isLogin, clearUser, myUrls, allUrls } = useUserStore();
+    const { setUser, isLogin, clearUser, myUrls, allUrls, getAllUrls, getMyUrls } = useUserStore();
+    const { setTestAuthCb } = useTestAuthStore();
 
     useEffect(() => {
+        getAllUrls();
         auth.onAuthStateChanged((res) => {
 
             if (res) {
                 // 로그인
                 console.log("로그인");
                 setUser(res);
+            }
+            else {
+                // 로그아웃
+                console.log("로그아웃");
+                clearUser();
+            }
+            // console.log(res);
+        })
+
+        setTestAuthCb((res) => {
+
+            if (res) {
+                // 로그인
+                console.log("로그인");
+                setUser(res)
+                .then(getMyUrls)
+                .catch(err => console.log(err));
             }
             else {
                 // 로그아웃
@@ -68,7 +87,8 @@ export const Main = () => {
                     ) :
                     (
                         <main>
-                            <Login />
+                            {/* <Login /> */}
+                            <TestLogin />
                         </main>
                     )
             } />
@@ -76,7 +96,7 @@ export const Main = () => {
                 <main>
                     <Slide />
                     <TagList />
-                    <CardList cardInfos={allUrls} />
+                    <CardList cardInfos={allUrls}/>
                 </main>
             } />
             <Route path="setting" element={"setting"} />

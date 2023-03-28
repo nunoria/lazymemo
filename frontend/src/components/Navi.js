@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from './Buttons';
 import { useUserStore } from "store"
 import { getAuth } from "firebase/auth";
+import { useTestAuthStore } from "store"
+
 
 const NAVI_BTN_MYURL = {
     name: "My URL",
@@ -20,6 +22,7 @@ export default function Navi() {
     const [popupOn, setPopupOn] = useState(false);
     let location = useLocation();
     // console.log(location.pathname);
+    const { setTestAuthLogout } = useTestAuthStore();
 
     return (
         <div className="bg-top flex justify-center h-[87px] py-3">
@@ -50,10 +53,12 @@ export default function Navi() {
                                 <Link to="setting"><button className=' hover:text-gray-600'>설정</button></Link>
 
                                 <button onClick={() => {
-                                    const auth = getAuth();
+                                    // const auth = getAuth();
 
-                                    auth.signOut();
-                                    auth.updateCurrentUser();
+                                    // auth.signOut();
+                                    // auth.updateCurrentUser();
+
+                                    setTestAuthLogout();
                                 }} className=' hover:text-gray-600'>로그아웃</button>
                             </div>
                         </div>

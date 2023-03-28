@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import * as _ from 'lodash'
-import { getUserDocById, updateUserDoc, setMyUrlsDoc, setUserDoc, addMyUrlsDoc, getMyUrlsDocs, delMyUrlsDoc } from 'components/db/Contorl'
+import { getUserDocById, updateUserDoc, setMyUrlsDoc, setUserDoc, addMyUrlsDoc, getMyUrlsDocs, delMyUrlsDoc, getAllUrlsDocs } from 'components/db/Contorl'
 
 const userInitialDbInfo = {
     deadline: 7,
@@ -126,8 +126,11 @@ export const useUserStore = create((set, get) => ({
                     userDbRef: res.docRef
                 }
             )
+
+            return true;
         } catch (error) {
             console.log("error setUser :", error);
+            throw new Error("setUser is failed!");
         }
 
     },
@@ -144,14 +147,14 @@ export const useUserStore = create((set, get) => ({
             newUserTagsChecked.push(tag);
         else {
             let idx = newUserTagsChecked.indexOf(tag);
-            newUserTagsChecked.splice(idx,1);
+            newUserTagsChecked.splice(idx, 1);
         }
 
         set({ userTagsChecked: newUserTagsChecked });
     },
-    clearUserTagsChecked: () =>{
+    clearUserTagsChecked: () => {
         console.log("clear userTagsChecked");
-        set({userTagsChecked: []});
+        set({ userTagsChecked: [] });
     },
     addTag: async (tag) => {
         try {
@@ -251,7 +254,70 @@ export const useUserStore = create((set, get) => ({
 
         } catch (error) {
             console.log('error getMyUrls :', error);
+            throw new Error("getMyUrls is failed!");
         }
+    },
+    getAllUrls: async () => {
+        try {
+            let res = await getAllUrlsDocs();
+            console.log('getAllUrls: get Data', res);
+
+            set(() => ({
+                allUrls: res.map((item) => {
+                    let tmpUrl = new Url(item.docData);
+                    tmpUrl.urlDbRef = item.docRef;
+                    return tmpUrl;
+                })
+            }))
+
+        } catch (error) {
+            console.log('error getAllUrls :', error);
+        }
+    }
+
+}))
+
+
+export const useTestAuthStore = create((set, get) => ({
+
+    authState: false,
+    authEmail: null,
+    authChangedCallback: null,
+    setTestAuthLogin: (input) => {
+        if (get().authState == true) return;
+
+        console.log('login input', input);
+        set(
+            {
+                authState: true,
+                authEmail: input
+            }
+        )
+        if (get().authChangedCallback != null)
+            get().authChangedCallback({email:input});
+    },
+    setTestAuthLogout: () => {
+        if (get().authState == false) return;
+
+        console.log('logout')
+        set(
+            {
+                authState: false,
+                authEmail: null
+            }
+        )
+        if (get().authChangedCallback != null)
+            get().authChangedCallback(null);
+    },
+    setTestAuthCb: (input) => {
+        if (typeof input !== 'function') {
+            console.log('함수가 아닙니다.');
+            return;
+        }
+
+        set({
+            authChangedCallback: input
+        })
     }
 
 }))
