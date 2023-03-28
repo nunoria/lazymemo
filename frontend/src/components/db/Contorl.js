@@ -1,8 +1,12 @@
 
-import { getFirestore, addDoc, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { connectFirestoreEmulator, getFirestore, addDoc, collection, query, where, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { db } from "fbase";
 
 const USERS_COLLECTION_NAME = "users"
 const MYURLS_COLLECTION_NAME = "myUrls"
+const ALLURLS_COLLECTION_NAME = "allUrls"
+
+connectFirestoreEmulator(db, 'localhost', 8080);
 
 /*
 Doc 에 접근하기 위해서는 Ref가 필요한데,
@@ -12,7 +16,7 @@ Doc id로 다시 Doc ref를 찾아야 함
 */
 const getUserDocById = async (userId) => {
 
-    const db = getFirestore();
+    // const db = getFirestore();
     const q = query(collection(db, USERS_COLLECTION_NAME), where("userId", "==", userId));
 
     try {
@@ -59,6 +63,21 @@ export const getMyUrlsDocs = async (userDbRef) => {
     return res;
 }
 
+export const getAllUrlsDocs = async () => {
+
+    const querySnapshot = await getDocs(collection(db, ALLURLS_COLLECTION_NAME));
+    let res = [];
+
+    querySnapshot.forEach((docSnap) => {
+        let docData = docSnap.data();
+        docData.created = docData.created?.toDate();
+        // let docRef = doc(userDbRef, ALLURLS_COLLECTION_NAME, docSnap.id);
+        let docRef = docSnap.ref;
+        res.push({ docRef: docRef, docData: docData });
+    })
+
+    return res;
+}
 
 
 /*
