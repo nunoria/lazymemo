@@ -33,7 +33,6 @@ export const Main = () => {
     const { setTestAuthCb } = useTestAuthStore();
 
     useEffect(() => {
-        getAllUrls();
         auth.onAuthStateChanged((res) => {
 
             if (res) {
@@ -109,7 +108,10 @@ export const Footer = () => {
 
     return (
         <footer>
-            <div className=" bg-footer h-[200px]"></div>
+            <div name="container" className="bg-footer h-[200px] text-white p-4 flex flex-col">
+                <span>사업자 이름</span>
+                <span>대표자 명</span>
+            </div>
         </footer>
     )
 }
